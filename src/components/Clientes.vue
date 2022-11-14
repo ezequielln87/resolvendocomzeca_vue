@@ -2,7 +2,7 @@
 
 <template>
   <v-container>
-    <v-snackbar v-model="snackbar" :timeout="timeout" :color="color">
+    <v-snackbar v-model="snackbar" :color="color">
       {{ message }}
       <v-btn dark text @click="snackbar = false">
         <v-icon>mdi-close</v-icon>
@@ -77,11 +77,11 @@
             <v-btn color="primary" @click="initialize"> Recargar </v-btn>
           </template>
           <template v-slot:[`item.actions`]="{ item }">
-              <v-icon small class="mr-2" @click="editItem(item)">
-                mdi-pencil
-              </v-icon>
-              <v-icon small @click="deleteItem(item)"> mdi-delete </v-icon>
-            </template>
+            <v-icon small class="mr-2" @click="editItem(item)">
+              mdi-pencil
+            </v-icon>
+            <v-icon small @click="deleteItem(item)"> mdi-delete </v-icon>
+          </template>
         </v-data-table>
       </v-col>
     </v-row>
@@ -101,9 +101,9 @@ export default {
       nome: "",
       cpf: "",
       email: "",
-      telefone: ""
+      telefone: "",
     },
-    
+
     headers: [
       {
         text: "Nome",
@@ -133,9 +133,17 @@ export default {
   },
 
   methods: {
+   
     async getClientes() {
-      let response = await this.$http.get("clientelist/");
-      this.clientes = response.data;
+
+      try {
+        let response = await this.$http.get("list/");
+        this.clientes = response.data;       
+      } catch (error) {
+        //redirect
+        this.$router.push({ name: "login" });
+      }
+              
 
       // this.$http.get("clientelist/").then((response) => {
       //   this.clientes = response.data;
@@ -154,8 +162,8 @@ export default {
         });
       } else {
         this.$http
-        .post("clientecreate/", this.editedItem)
-        .then(() => {
+          .post("clientecreate/", this.editedItem)
+          .then(() => {
             this.clientes.push(this.editedItem);
             // this.clientes.push(response.data);
             // this.dialog = false;
@@ -168,7 +176,7 @@ export default {
             console.log(error);
           });
       }
-      
+
       this.dialog = false;
     },
 
@@ -181,18 +189,16 @@ export default {
     },
 
     editItem(item) {
-      
       this.editedIndex = this.clientes.indexOf(item);
       this.editedItem = Object.assign({}, item);
       this.dialog = true;
-
     },
 
     deleteItem(item) {
       const index = this.clientes.indexOf(item);
       confirm("Você tem certeza que deseja deletar este item?") &&
         this.clientes.splice(index, 1);
-      
+
       this.$http({
         method: "delete",
         url: "clientedelete/" + item.id + "/",
@@ -202,13 +208,12 @@ export default {
         this.message = "Cliente apagado com sucesso!";
         this.color = "success";
         console.log(response);
-      }); 
+      });
     },
-
   },
 
-  initialize() {
-    this.getClientes();
-  },
+  // initialize() {
+  //   this.getClientes();
+  // },
 };
 </script>
