@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <TopBar v-show="user.token" />
+    <TopBar v-show="access.token" />
     <v-main>
       <router-view />
     </v-main>
@@ -10,14 +10,15 @@
 <script>
 import { mapGetters } from "vuex";
 import TopBar from "@/components/TopBar";
+
 export default {
   name: "App",
 
   data: () => ({}),
-  components:{
+  components: {
     TopBar,
   },
-  
+
   created() {
     if (localStorage.getItem("authtoken") == null) {
       this.$router.push("/login");
@@ -27,7 +28,7 @@ export default {
   },
 
   computed: {
-    ...mapGetters(["getUser"]),
+    ...mapGetters(["getAccess", "getUser"]),
     user: {
       get() {
         return this.$store.getters.getUser;
@@ -44,6 +45,7 @@ export default {
         this.$store.dispath("setAccess", value);
       },
     },
+         
     //
   },
 };

@@ -1,6 +1,5 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import router from '../router/index'
 
 
 Vue.use(Vuex)
@@ -25,11 +24,6 @@ export default new Vuex.Store({
         setAccess(context, payload) {
             context.commit('setAccess', payload)
         },
-        logoff(context) {
-            context.dispatch("setUser", {})
-            localStorage.removeItem('authtoken')
-            router.push("register/").catch(() => {})
-        }
     },
     getters: {
         getUser(state) {

@@ -4,7 +4,7 @@
   <v-container>
     <v-snackbar v-model="snackbar" :color="color">
       {{ message }}
-      <v-btn dark text @click="snackbar = false">
+      <v-btn dark text absolute @click="snackbarAlter(false)"> 
         <v-icon>mdi-close</v-icon>
       </v-btn>
     </v-snackbar>
@@ -93,6 +93,8 @@
 export default {
   name: "ClientesList",
   data: () => ({
+    color: 'primary',
+    message: '',         
     dialog: false,
     snackbar: false,
     clientes: [],
@@ -186,6 +188,10 @@ export default {
         this.editedItem = Object.assign({}, this.defaultItem);
         this.editedIndex = -1;
       }, 300);
+    },
+    
+    snackbarAlter(bool){
+      this.snackbar = bool;
     },
 
     editItem(item) {

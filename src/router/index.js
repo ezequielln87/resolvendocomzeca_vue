@@ -27,8 +27,14 @@ const routes = [
     component: function () {
       return import(/* webpackChunkName: "about" */ '../views/LoginView.vue')
     }
-  }
-
+  },
+  {
+    path: '/perfil',
+    name: 'perfil',
+    component: function () {
+      return import(/* webpackChunkName: "about" */ '../views/PerfilView.vue')
+    }
+  },
 ]
 
 const router = new VueRouter({

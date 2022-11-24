@@ -35,6 +35,9 @@
 
 <script>
 import { mapActions } from "vuex";
+// import VueJwtDecode from 'vue-jwt-decode'
+import jwt_decode from 'jwt-decode';
+
 
 export default {
   name: "LoginView",
@@ -58,8 +61,11 @@ export default {
         console.log(token);
         this.$http.defaults.headers.common["Authorization"] = "Bearer " + token;
         localStorage.setItem("authtoken", token);
-        this.$store.dispatch("setUser", { token: token });
-        // console.log(this.$store.getters.getAccess);
+        let decoded = jwt_decode(token);
+        // console.log(token);
+        console.log(decoded);
+        this.$store.dispatch("setUser", { user: decoded });
+        this.$store.dispatch("setAccess", { token: token });
         this.$router.push({ name: "clienteslist" });
       });
    
