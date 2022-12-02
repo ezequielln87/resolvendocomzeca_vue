@@ -1,5 +1,11 @@
 <template>
   <v-container>
+    <v-snackbar v-model="snackbar" :color="color">
+      {{ message }}
+      <v-btn dark text absolute @click="snackbarAlter(false)"> 
+        <v-icon>mdi-close</v-icon>
+      </v-btn>
+    </v-snackbar>
     <v-row>
       <v-col cols="12">
         <v-card>
@@ -60,28 +66,25 @@
                             <v-text-field
                               v-model="perfil.username"
                               label="Usuário"
-                              readonly
+                              disabled
                             ></v-text-field>
                           </v-col>
                           <v-col cols="6">
                             <v-text-field
                               v-model="perfil.first_name"
                               label="Nome"
-                              readonly
                             ></v-text-field>
                           </v-col>
                           <v-col cols="6">
                             <v-text-field
                               v-model="perfil.last_name"
                               label="Último Nome"
-                              readonly
                             ></v-text-field>
                           </v-col>
                           <v-col cols="6">
                             <v-text-field
                               v-model="perfil.email"
                               label="Email"
-                              readonly
                             ></v-text-field>
                           </v-col>
                           <v-col cols="6">
@@ -91,7 +94,6 @@
                                 disabled
                                 label="Administrador"
                               ></v-checkbox>
-                              
                               <v-checkbox
                                 v-model="perfil.is_staff"
                                 disabled
@@ -110,7 +112,7 @@
                             <v-text-field
                               v-model="perfil.date_joined"
                               label="Data de Cadastro"
-                              readonly
+                              disabled
                             >
                             </v-text-field>
                           </v-col>
@@ -119,9 +121,20 @@
                             <v-text-field
                               v-model="perfil.last_login"
                               label="Último Login"
-                              readonly
+                              disabled
                             >
                             </v-text-field>
+                          </v-col>
+                          <!-- save -->
+                          <v-col cols="12">
+                            <v-btn
+                              color="success"
+                              class="mr-4"
+                              @click="save"
+                              :disabled="!isChanged"
+                            >
+                              Salvar
+                            </v-btn>
                           </v-col>
                         </v-row>
                       </v-container>
@@ -142,6 +155,7 @@ import Vue from "vue";
 
 export default {
   props: {},
+
   user: {
     id: 0,
     user: "",
@@ -150,9 +164,13 @@ export default {
   name: "PerfilView",
   data() {
     return {
+      color: 'primary',
+      message: '',  
+      snackbar: false,
+      dialog: false,
+      avatar: null,
       files: [],
       perfil: {
-        id: 1,
         is_superuser: true,
         username: "",
         first_name: "",
@@ -166,10 +184,18 @@ export default {
     };
   },
 
+  watch: {
+    dialog(val) {
+      val || this.close();
+    },
+  },
   methods: {
     async getPerfil() {
       try {
         this.user = await this.$store.getters.getUser.user.user_id;
+        if (this.user == undefined) {
+          return;
+        }
         let response = await this.$http.get("user/detail/" + this.user + "/");
         this.perfil = response.data;
         Vue.use(require("vue-moment"));
@@ -181,19 +207,102 @@ export default {
         );
       } catch (error) {
         //redirect
-        this.$router.push({ name: "login" });
+        // this.$router.push({ name: "login" }).catch(() => {});
+        // console.log(error);
       }
     },
-    async getUser() {
+    async getUserAvatar() {
       try {
         let idUser = await this.$store.getters.getUser.user.user_id;
+        if (idUser == undefined) {
+          return;
+        }
         let response = await this.$http.get("user/image/" + idUser + "/");
-        this.$store.commit("setUser", response.data);
-
+        // this.$store.commit("setUser", response.data);
+        // this.$store.dispatch("setAvatar", response.data.avatar);
         this.avatar = response.data.avatar;
+        // console.log(this.avatar);
       } catch (error) {
         console.log(error);
       }
+    },
+
+    snackbarAlter(bool){
+      this.snackbar = bool;
+      // this.$router.push({ name: "clienteslist" }).catch(() => {});
+      //reload app
+      // this.$router.go();
+      
+    },
+
+    save() {    
+      if (this.files != []) {
+        // upload image avatar
+        // console.log('aham');
+        let formData = new FormData();
+        formData.append("avatar", this.files);
+        this.$http
+          .put("user/image-update/" + this.user + "/", formData)
+          .then((response) => {
+            this.snackbar = true;
+            this.message = "Atualizado usuário com sucesso!";
+            this.color = "success";
+            // this.$store.dispatch("setAvatar", response.data.avatar);
+            this.avatar = response.data.avatar;
+            // update topbar image user
+            this.$store.dispatch("setAvatar", this.avatar);
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+
+        
+
+
+      }
+      
+
+      
+
+      
+      // console.log(this.perfil.email);
+      this.$http
+        .get("user/detail/" + this.perfil.id + "/", {
+          first_name: this.perfil.first_name,
+          last_name: this.perfil.last_name,
+          email: this.perfil.email,
+        })
+        .then((resp) => {
+          console.log(resp);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+
+      // try {
+      //   console.log(this.perfil);
+      //   console.log("user/detail/" + this.perfil.id + "/");
+      //   let response = await this.$http.patch(
+      //     "user/detail/" + this.perfil.id + "/",
+      //     {
+      //       "is_superuser": true,
+      //       "username": "zeca",
+      //       "first_name": "Zeca 123",
+      //       "last_name": "1234",
+      //       "email": "zeca@zeca.com.br",
+      //       "is_staff": true,
+      //       "is_active": true,
+      //       "date_joined": "2022-11-14T21:22:10Z",
+      //       "last_login": "2022-11-22T00:17:39.919909Z"
+      //     }
+      //   );
+      //   alert("Dados atualizados com sucesso!");
+      //   console.log(response);
+      //   // this.$store.commit("setUser", response.data);
+      //   // this.$router.push({ name: "perfil" })
+      // } catch (error) {
+      //   console.log(error);
+      // }
     },
   },
   created() {
@@ -204,8 +313,18 @@ export default {
   },
   computed: {
     avatarImage() {
-      this.getUser();
-      return this.avatar === null ? 'https://cdn.vuetifyjs.com/images/logos/vuetify-logo-dark.png' : this.avatar;
+      this.getUserAvatar();
+      return this.avatar === undefined
+        ? "https://cdn.vuetifyjs.com/images/logos/vuetify-logo-dark.png"
+        : this.avatar;
+    },
+    isChanged() {
+      return (
+        this.perfil.username !== "" &&
+        this.perfil.first_name !== "" &&
+        this.perfil.last_name !== "" &&
+        this.perfil.email !== ""
+      );
     },
   },
 };
