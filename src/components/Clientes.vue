@@ -73,9 +73,9 @@
           class="elevation-1"
           hide-default-footer
         >
-          <template v-slot:no-data>
-            <v-btn color="primary" @click="initialize"> Recargar </v-btn>
-          </template>
+          <!-- <template v-slot:no-data>
+            <v-btn color="primary" > Recargar </v-btn>
+          </template> -->
           <template v-slot:[`item.actions`]="{ item }">
             <v-icon small class="mr-2" @click="editItem(item)">
               mdi-pencil
@@ -143,7 +143,7 @@ export default {
         this.clientes = response.data;       
       } catch (error) {
         //redirect
-        this.$router.push({ name: "login" });
+        this.$router.push({ name: "login" }).catch(() => {});
       }
               
 

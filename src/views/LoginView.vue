@@ -66,7 +66,7 @@ export default {
         console.log(decoded);
         this.$store.dispatch("setUser", { user: decoded });
         this.$store.dispatch("setAccess", { token: token });
-        this.$router.push({ name: "clienteslist" });
+        this.$router.push({ name: "clienteslist" }).catch(() => {});
       });
    
     },

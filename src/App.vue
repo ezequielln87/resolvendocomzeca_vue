@@ -21,9 +21,9 @@ export default {
 
   created() {
     if (localStorage.getItem("authtoken") == null) {
-      this.$router.push("/login");
+      this.$router.push("/login").catch(() => {});
     } else {
-      this.$router.push({ name: "clienteslist" });
+      this.$router.push({ name: "clienteslist" }).catch(() => {});
     }
   },
 

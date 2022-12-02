@@ -24,7 +24,6 @@
 
     <v-menu offset-y>
       <template v-slot:activator="{ on, attrs }">
-        
         <v-btn icon v-bind="attrs" v-on="on">
           <v-avatar size="64px">
             <v-img :src="avatarImage"></v-img>
@@ -32,7 +31,7 @@
         </v-btn>
       </template>
       <v-list>
-      <v-list-item link @click="goTo({ name: 'clienteslist' })">
+        <v-list-item link @click="goTo({ name: 'clienteslist' })">
           <v-list-item-icon>
             <v-icon>mdi-office-building-marker-outline</v-icon>
           </v-list-item-icon>
@@ -63,7 +62,7 @@ export default {
     drawer: null,
     avatar: null,
   }),
-    
+
   methods: {
     logOff() {
       this.$router.push("/login");
@@ -73,34 +72,41 @@ export default {
     },
 
     async getIcon() {
-       try {
-        let idUser =  this.$store.getters.getUser.user.user_id
-        console.log(idUser);
-        let response = await this.$http.get("user/image/"+idUser+"/");
-        // console.log(idUser);
-        // this.clientes = response.data;       
-        // console.log(response.data.avatar);
-        // return response.data.avatar;
-        this.avatar = response.data.avatar
-      } catch (error) {
-        //redirect
-        // this.$router.push({ name: "login" });
-        console.log(error);
+      // store avatar $store
+      let img = this.$store.getters.getAvatar;
+      if (img) {
+        this.avatar = img;
+      } else {
+        try {
+          let idUser = this.$store.getters.getUser.user.user_id;
+          console.log(idUser);
+          let response = await this.$http.get("user/image/" + idUser + "/");
+          // console.log(idUser);
+          // this.clientes = response.data;
+          // console.log(response.data.avatar);
+          // return response.data.avatar;
+          this.avatar = response.data.avatar;
+        } catch (error) {
+          //redirect
+          // this.$router.push({ name: "login" });
+          console.log(error);
+        }
       }
     },
 
     goTo(route) {
-      this.$router.push(route);
+      this.$router.push(route).catch(() => {});
     },
   },
 
   computed: {
     avatarImage() {
-      this.getIcon()
-      return this.avatar === null ? 'https://cdn.vuetifyjs.com/images/logos/vuetify-logo-dark.png' : this.avatar;
+      this.getIcon();
+      return this.avatar === null
+        ? "https://cdn.vuetifyjs.com/images/logos/vuetify-logo-dark.png"
+        : this.avatar;
     },
   },
-  
 };
 </script>
 

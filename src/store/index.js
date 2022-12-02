@@ -7,7 +7,9 @@ Vue.use(Vuex)
 export default new Vuex.Store({
     state: {
         user: {},
-        access: {}
+        access: {},
+        avatar: {}
+        
     },
     mutations: {
         setUser(state, payload) {
@@ -15,6 +17,9 @@ export default new Vuex.Store({
         },
         setAccess(state, payload) {
             state.access = payload
+        },
+        setAvatar(state, payload) {
+            state.avatar = payload
         }
     },
     actions: {
@@ -24,6 +29,10 @@ export default new Vuex.Store({
         setAccess(context, payload) {
             context.commit('setAccess', payload)
         },
+        setAvatar(context, payload) {
+            context.commit('setAvatar', payload)
+        }
+
     },
     getters: {
         getUser(state) {
@@ -31,6 +40,9 @@ export default new Vuex.Store({
         },
         getAccess(state) {
             return state.access
+        },
+        getAvatar(state) {
+            return state.avatar
         }
     },
 
